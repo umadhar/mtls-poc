@@ -1,0 +1,11 @@
+server:
+  port: 9090
+
+resttemplate:
+  ssl:
+    key-store: classpath:mtls-keystore.p12   # or mtls2-keystore.p12 for mtls2
+    key-store-password: changeit
+    key-store-type: PKCS12
+    trust-store: classpath:ca-truststore.p12
+    trust-store-password: changeit
+    trust-store-type: PKCS12

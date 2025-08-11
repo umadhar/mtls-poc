@@ -1,0 +1,11 @@
+server:
+  port: 9091
+
+resttemplate:
+  ssl:
+    key-store: classpath:mtls2-keystore.p12   # Wrong certificate to test failure
+    key-store-password: changeit
+    key-store-type: PKCS12
+    trust-store: classpath:ca-truststore.p12
+    trust-store-password: changeit
+    trust-store-type: PKCS12

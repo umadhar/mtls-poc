@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: service-a
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service-a/**
+          filters:
+            - name: CertificateAuthorizationFilter
+        - id: service-b
+          uri: http://localhost:8082
+          predicates:
+            - Path=/service-b/**
+          filters:
+            - name: CertificateAuthorizationFilter
+
+server:
+  port: 8080
+  ssl:
+    enabled: true
+    key-store: classpath:gateway-keystore.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+    trust-store: classpath:ca-truststore.p12
+    trust-store-password: changeit
+    trust-store-type: PKCS12
+    client-auth: need
