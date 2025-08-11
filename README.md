@@ -87,6 +87,103 @@ External: CN=mobile-app, O=Company
 Internal: CN=service-a.internal, O=Company, OU=Services
 ```
 
+## Certificate Management
+
+### Creating Root CA Certificate
+```bash
+# Generate CA private key
+openssl genrsa -out ca-key.pem 4096
+
+# Create CA certificate
+openssl req -new -x509 -days 365 -key ca-key.pem -out ca-cert.pem \
+  -subj "/C=US/ST=CA/L=San Francisco/O=Company/CN=Root-CA"
+```
+
+### Creating Server Certificates (Gateway)
+```bash
+# Generate gateway private key
+openssl genrsa -out gateway-key.pem 2048
+
+# Create certificate signing request
+openssl req -new -key gateway-key.pem -out gateway.csr \
+  -subj "/C=US/ST=CA/L=San Francisco/O=Company/CN=gateway"
+
+# Sign with CA
+openssl x509 -req -in gateway.csr -CA ca-cert.pem -CAkey ca-key.pem \
+  -CAcreateserial -out gateway-cert.pem -days 365
+
+# Create PKCS12 keystore
+openssl pkcs12 -export -in gateway-cert.pem -inkey gateway-key.pem \
+  -out gateway-keystore.p12 -name gateway -password pass:changeit
+```
+
+### Creating Client Certificates
+
+#### mTLS App Certificate (Full Access)
+```bash
+# Generate client private key
+openssl genrsa -out mtls-key.pem 2048
+
+# Create certificate signing request
+openssl req -new -key mtls-key.pem -out mtls.csr \
+  -subj "/C=US/ST=CA/L=San Francisco/O=Company/CN=mtls"
+
+# Sign with CA
+openssl x509 -req -in mtls.csr -CA ca-cert.pem -CAkey ca-key.pem \
+  -CAcreateserial -out mtls-cert.pem -days 365
+
+# Create PKCS12 keystore
+openssl pkcs12 -export -in mtls-cert.pem -inkey mtls-key.pem \
+  -out mtls-keystore.p12 -name mtls -password pass:mtls11
+```
+
+#### mTLS2 App Certificate (Limited Access)
+```bash
+# Generate client private key
+openssl genrsa -out mtls2-key.pem 2048
+
+# Create certificate signing request
+openssl req -new -key mtls2-key.pem -out mtls2.csr \
+  -subj "/C=US/ST=CA/L=San Francisco/O=Company/CN=mtls2"
+
+# Sign with CA
+openssl x509 -req -in mtls2.csr -CA ca-cert.pem -CAkey ca-key.pem \
+  -CAcreateserial -out mtls2-cert.pem -days 365
+
+# Create PKCS12 keystore
+openssl pkcs12 -export -in mtls2-cert.pem -inkey mtls2-key.pem \
+  -out mtls2-keystore.p12 -name mtls2 -password pass:changeit
+```
+
+### Creating Truststore
+```bash
+# Create truststore with CA certificate
+keytool -import -file ca-cert.pem -alias ca-root \
+  -keystore ca-truststore.p12 -storetype PKCS12 \
+  -storepass changeit -noprompt
+```
+
+### Certificate File Structure
+```
+src/main/resources/
+├── gateway-keystore.p12      # Gateway server certificate
+├── ca-truststore.p12         # CA certificate for validation
+├── mtls-keystore.p12         # mTLS app client certificate
+└── mtls2-keystore.p12        # mTLS2 app client certificate
+```
+
+### Certificate Validation Commands
+```bash
+# View certificate details
+keytool -list -v -keystore gateway-keystore.p12 -storetype PKCS12
+
+# View truststore contents
+keytool -list -v -keystore ca-truststore.p12 -storetype PKCS12
+
+# Test certificate chain
+openssl verify -CAfile ca-cert.pem gateway-cert.pem
+```
+
 ## Security Features
 
 ### 1. Mutual TLS (mTLS)
