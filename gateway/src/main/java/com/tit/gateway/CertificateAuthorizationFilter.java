@@ -27,17 +27,21 @@ public class CertificateAuthorizationFilter extends AbstractGatewayFilterFactory
                 return chain.filter(exchange);
             }
             
-            // Extract client certificate
+            // Extract client certificate with null safety
+            if (exchange.getRequest().getSslInfo() == null) {
+                return unauthorized(exchange);
+            }
+
             X509Certificate[] certs = exchange.getRequest().getSslInfo().getPeerCertificates();
             if (certs == null || certs.length == 0) {
                 return unauthorized(exchange);
             }
             
             String clientCN = extractCN(certs[0].getSubjectX500Principal());
-            
-            // Identify traffic type
-            boolean isInternal = rbacService.isInternalTraffic(clientCN);
-            
+            if (clientCN == null) {
+                return unauthorized(exchange);
+            }
+
             // RBAC using service
             String role = rbacService.getRoleForCertificate(clientCN);
             if (role == null) {
@@ -49,8 +53,6 @@ public class CertificateAuthorizationFilter extends AbstractGatewayFilterFactory
             } else {
                 return forbidden(exchange);
             }
-            
-            return unauthorized(exchange);
         };
     }
     

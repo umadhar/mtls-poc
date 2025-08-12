@@ -1,0 +1,53 @@
+# Generate CA private key
+openssl genrsa -out ca.key 4096
+
+# Generate CA certificate
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 30 -out ca.crt -subj "/CN=MyCA"
+
+
+
+
+# Generate private key for Gateway
+openssl genrsa -out gateway.key 2048
+
+# Generate CSR for Gateway
+openssl req -new -key gateway.key -out gateway.csr -subj "/CN=gateway"
+
+# Sign the Gateway CSR with the CA
+openssl x509 -req -in gateway.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gateway.crt -days 30 -sha256
+
+
+
+# Generate private key for mtls client
+openssl genrsa -out mtls.key 2048
+
+# Generate CSR for mtls client
+openssl req -new -key mtls.key -out mtls.csr -subj "/CN=mtls"
+
+# Sign the mtls client CSR with the CA
+openssl x509 -req -in mtls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out mtls.crt -days 30 -sha256
+
+
+
+# Generate private key for mtls2 client
+openssl genrsa -out mtls2.key 2048
+
+# Generate CSR for mtls2 client
+openssl req -new -key mtls2.key -out mtls2.csr -subj "/CN=mtls2"
+
+# Sign the mtls2 client CSR with the CA
+openssl x509 -req -in mtls2.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out mtls2.crt -days 30 -sha256
+
+
+# Gateway keystore
+openssl pkcs12 -export -in gateway.crt -inkey gateway.key -out gateway-keystore.p12 -name gateway -CAfile ca.crt -caname root -password pass:changeit
+
+# mtls client keystore
+openssl pkcs12 -export -in mtls.crt -inkey mtls.key -out mtls-keystore.p12 -name mtls -CAfile ca.crt -caname root -password pass:changeit
+
+# mtls2 client keystore
+openssl pkcs12 -export -in mtls2.crt -inkey mtls2.key -out mtls2-keystore.p12 -name mtls2 -CAfile ca.crt -caname root -password pass:changeit
+
+
+# Import CA cert into a truststore
+keytool -import -trustcacerts -alias root -file ca.crt -keystore ca-truststore.p12 -storetype PKCS12 -storepass changeit -noprompt

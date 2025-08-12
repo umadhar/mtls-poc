@@ -1,44 +1,20 @@
 rbac:
+  # Certificate CN to role mapping
+  certificates:
+    mtls: "mtls-client"
+    mtls2: "mtls2-client"
+
+  # Role-based permissions
   roles:
-    # App-based roles instead of traditional roles
-    MTLS-APP:
+    mtls-client:
       - "/service-a/**"
       - "/service-b/**"
-      - "/user-service/**"
-      - "/order-service/**"
-    MTLS2-APP:
+    mtls2-client:
+      - "/service-a/**"
       - "/service-b/**"
-      - "/user-service/profile/**"
-    PAYMENT-APP:
-      - "/payment-service/**"
-      - "/user-service/billing/**"
-    FRONTEND-APP:
-      - "/service-b/**"
-      - "/public/**"
-  
-  certificates:
-    # External clients (different issuer/subject pattern)
-    mtls: MTLS-APP                    # External app
-    mtls2: MTLS2-APP                  # External app  
-    frontend: FRONTEND-APP            # External frontend
-    
-    # Internal services (internal issuer/subject pattern)
-    service-a.internal: SERVICE-A     # Internal service
-    service-b.internal: SERVICE-B     # Internal service
-    payment.internal: PAYMENT-SERVICE # Internal service
-  
-  # Public endpoints that don't require certificates
+
+  # Public endpoints (no authentication required)
   public-endpoints:
-    - "/public/**"
-    - "/health/**"
-    - "/info/**"
-  
-  # Internal service-to-service communication (bypass gateway)
-  internal-services:
-    SERVICE-A:
-      - "SERVICE-B"
-      - "USER-SERVICE"
-    SERVICE-B:
-      - "PAYMENT-SERVICE"
-    PAYMENT-SERVICE:
-      - "USER-SERVICE"
+    - "/actuator/health"
+    - "/actuator/info"
+

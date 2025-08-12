@@ -9,3 +9,20 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: true
+    # Cache control settings
+    registry-fetch-interval-seconds: 5    # How often to fetch registry from server (default: 30)
+    cache-refresh-executor-thread-pool-size: 2
+    disable-delta: true                   # Always fetch full registry instead of deltas
+  instance:
+    lease-renewal-interval-in-seconds: 5  # How often to renew lease (default: 30)
+    lease-expiration-duration-in-seconds: 10  # When server considers client dead (default: 90)
+
+# Enable actuator endpoints for cache management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,caches
+  endpoint:
+    health:
+      show-details: always
