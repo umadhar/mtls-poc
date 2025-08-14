@@ -35,24 +35,13 @@ rbac:
     MTLS-APP:
       - "/service-a/**"
       - "/service-b/**"
-      - "/user-service/**"
-      - "/order-service/**"
     MTLS2-APP:
       - "/service-b/**"
-      - "/user-service/profile/**"
-    PAYMENT-APP:
-      - "/payment-service/**"
-      - "/user-service/billing/**"
-    FRONTEND-APP:
-      - "/service-b/**"
-      - "/public/**"
   
   certificates:
     # External clients
     mtls: MTLS-APP
     mtls2: MTLS2-APP
-    payment-service: PAYMENT-APP
-    frontend: FRONTEND-APP
     
     # Internal services
     service-a.internal: SERVICE-A
@@ -71,8 +60,6 @@ rbac:
 |-------------------|------|------------------|------------------|---------------|
 | `mtls` | MTLS-APP | ✅ Full | ✅ Full | ✅ Yes |
 | `mtls2` | MTLS2-APP | ❌ No | ✅ Full | ✅ Yes |
-| `payment-service` | PAYMENT-APP | ❌ No | ❌ No | ✅ Yes |
-| `frontend` | FRONTEND-APP | ❌ No | ✅ Full | ✅ Yes |
 | No Certificate | GUEST | ❌ No | ❌ No | ✅ Yes |
 
 ## Traffic Type Identification
