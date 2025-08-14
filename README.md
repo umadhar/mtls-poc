@@ -64,9 +64,9 @@ rbac:
 
 ## Traffic Type Identification
 
-### External vs Internal Traffic
+### Example External vs Internal Traffic
 - **External**: `mobile-app`, `web-client`, `partner-xyz`
-- **Internal**: `service-a.internal`, `payment.svc`, `*.cluster.local`
+- **Internal**: `service-a.internal`, `service-b.internal`
 
 ### Certificate Naming Convention
 ```
