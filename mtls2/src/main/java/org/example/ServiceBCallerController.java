@@ -21,6 +21,13 @@ public class ServiceBCallerController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/call-service-b-response")
+    public ResponseEntity<String> callServiceBResponse() {
+        // Call service-b via the gateway
+        String response = restTemplate.getForObject("https://localhost:8080/service-b/response", String.class);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/call-service-a")
     public ResponseEntity<String> callServiceA() {
         // Call service-b via the gateway

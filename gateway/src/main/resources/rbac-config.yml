@@ -10,8 +10,8 @@ rbac:
       - "/service-a/**"
       - "/service-b/**"
     mtls2-client:
-      - "/service-a/**"
-      - "/service-b/**"
+  #   - "/service-a/**"
+      - "/service-b/response"
 
   # Public endpoints (no authentication required)
   public-endpoints:
